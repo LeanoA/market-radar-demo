@@ -21,20 +21,20 @@
 
 ## AI-Assisted Engineering Stack (Executive Summary)
 
-This repository was engineered from the terminal using a structured, specification-first AI workflow rather than ad-hoc prompting. A dual-model **Orchestrator** separates architectural planning from implementation, backed by persistent cross-session memory, specialized domain skills, and automated secret-scanning guardrails.
+This repository was engineered from the terminal using **Google Antigravity CLI (`agy`)** with Gemini's native **Plan Mode**, an `AGENTS.md` project contract, modular **Skills**, and automated **Guardrails**—a simple, reproducible setup anyone can adopt.
 
 | Layer | Component | Role in This Project |
 |---|---|---|
-| **Runtime Platform** | **Google Antigravity CLI (`agy`)** | Terminal agent runtime providing sandboxed shell execution, file tooling, MCP integration, and native subagent orchestration. |
-| **Harness & Methodology** | **Gentle AI — ODD (Organic Driven Development)** | Enforces `Authorize → Explore → Classify → Track → Implement → Verify`, bounded context budgets, and Risk-line verification gates. |
-| **Plan / Execute Pairing** | **Orchestrator** (`Gemini 4 Pro (Medium)` + `Gemini 4 Flash (High)`) | **Planner** inspects the codebase read-only and defines the contract; **Executor** applies edits, runs `pytest` / visual checks, and hands back on blockers. |
-| **Subagent Delegation** | **Dynamic Bounded Workers** | Keeps the main thread thin by delegating broad codebase mapping, parallel independent units, or high-risk verification only when triggers fire. |
-| **Persistent Memory** | **Engram (MCP)** | Preserves architectural decisions, bugfix root causes, and session summaries across sessions and context compactions. |
+| **Terminal Runtime** | **Google Antigravity CLI (`agy`)** | Terminal agent runtime providing sandboxed shell execution, file tooling, Plan Mode, and subagent orchestration. |
+| **Project Instructions** | **`AGENTS.md`** | Repository-level instruction file that gives the AI agent project conventions, test commands, and boundaries from the start. |
+| **Orchestration Mode** | **Plan / Execute** (`Gemini 4 Pro (Medium)` + `Gemini 4 Flash (High)`) | **Planner** inspects the codebase read-only and defines the plan; **Executor** applies edits, runs `pytest` / visual checks, and hands back on blockers. |
+| **Subagent Delegation** | **Bounded Subagents** | Keeps the main thread focused by delegating heavy exploration or independent checks when needed. |
 | **Domain & UI Skills** | `yahoo-finance`, `modern-web-guidance`, `impeccable`, `web-design-guidelines`, `cognitive-doc-design` | Supplies `yfinance` pipeline patterns, Baseline web APIs (`light-dark()`, `in oklab`, `<dialog closedby>`), botanical sage UI polish, and accessible docs. |
 | **Security Guardrails** | `install-guardrails` (`pre-commit` + `gitleaks`) | Blocks hardcoded secrets and private keys on every commit before code reaches GitHub. |
 
 **Core Concepts for Learners:**
-- **What is Orchestration Mode?** Instead of one monolithic chat trying to hold every file, decision, and edit at once, the agent acts as a *thin coordinator*: **Vertical Orchestration** splits read-only planning (`Gemini 4 Pro (Medium)`) from fast execution (`Gemini 4 Flash (High)`), while **Horizontal Orchestration** spawns isolated, bounded subagents only when concrete triggers fire (broad exploration, parallel work units, or high-risk verification).
+- **What is Orchestration Mode?** Instead of one monolithic chat trying to hold every file, decision, and edit at once, the agent acts as a *thin coordinator*: **Vertical Orchestration** splits read-only planning (`Gemini 4 Pro (Medium)`) from fast execution (`Gemini 4 Flash (High)`), while **Horizontal Orchestration** spawns isolated subagents for heavy exploration or independent verification.
+- **What is `AGENTS.md`?** A standard Markdown file in the project root written *for AI agents* (like a `README.md` for your coding assistant). It documents build/test commands, coding conventions, and project rules so you don't have to repeat context in every prompt.
 - **What are Skills?** On-demand, modular playbooks (`SKILL.md` + helper scripts) loaded *only* when a task matches their domain (e.g., `modern-web-guidance` for CSS `light-dark()` / `in oklab` or `impeccable` for visual contrast). They teach the model *how to build well* without bloating the base prompt.
 - **What are Guardrails?** Deterministic, non-negotiable enforcement boundaries (terminal sandboxing, read-only Plan Mode locks, `pytest` integrity gates, and `pre-commit` + `gitleaks` secret/private-key scanners) that guarantee *what must never break or leak*, regardless of what the LLM generates.
 
