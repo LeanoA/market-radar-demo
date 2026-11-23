@@ -87,6 +87,20 @@ Skills are modular `SKILL.md` instruction packages loaded dynamically when a tas
 | **`web-design-guidelines`** | Project skill (`.agents/skills/web-design-guidelines`) | Supplemented accessibility, semantic landmarks, keyboard navigation (`/` search focus, dialog arrow stepping), and responsive table behavior. |
 | **`cognitive-doc-design`** | Global skill | Structured documentation (`README.md` and this guide) around low cognitive load: lead with the answer, progressive disclosure, tables over dense prose, and scannable sections. |
 
+#### How to Install & Reuse These Skills (`skills.sh` or Copy-Paste)
+
+You can add any of these skills to your own repository in two ways:
+
+1. **Via `skills.sh` CLI** (installs into `.agents/skills/` and records versions in `skills-lock.json`):
+   ```bash
+   # Financial data & yfinance patterns
+   npx skills add gracefullight/stock-checker --skill yahoo-finance
+
+   # Accessibility & web UI guidelines
+   npx skills add vercel-labs/agent-skills --skill web-design-guidelines
+   ```
+2. **Via manual copy-paste:** Copy any skill folder (containing `SKILL.md` plus optional `scripts/` or `references/`) directly into your project's `.agents/skills/<skill-name>/` directory (or your global Antigravity skills directory). In this repository, `.agents/skills/impeccable`, `.agents/skills/yahoo-finance`, and `.agents/skills/web-design-guidelines` are checked in locally, while `modern-web-guidance` runs via `npx -y modern-web-guidance@latest`.
+
 ### Deterministic Guardrails Enforced in This Project
 
 Guardrails do not trust LLM willpower—they are automated gates enforced by the environment and repository tooling:
@@ -97,6 +111,24 @@ Guardrails do not trust LLM willpower—they are automated gates enforced by the
 | **Plan Mode Read-Only Lock** | Gemini Plan Mode | Prevents the Planner from mutating files during investigation and forces explicit verification criteria before edits begin. |
 | **Commit Secret & Key Guard** | `install-guardrails` (`.pre-commit-config.yaml` + `gitleaks` + `detect-private-key`) | Scans every staged change before `git commit` completes, blocking hardcoded tokens, credentials, or private keys. |
 | **Automated Integrity & Factor Suite** | `pytest` (`tests/test_build_radar.py`, `tests/test_site_integrity.py`) | Verifies quantitative formulas, offline snapshot schema, accessibility attributes, favicon presence, and documentation links. |
+
+#### How to Install the Pre-Commit Secret Guardrails
+
+**What it is for:** When working fast with AI agents, it is easy to paste an `.env` token, API key, or SSH private key into a file. The pre-commit guardrail (powered by [`LeanoA/agent-secret-guard`](https://github.com/LeanoA/agent-secret-guard)) runs **`gitleaks`** (`v8.30.1`) and **`detect-private-key`** (`pre-commit-hooks v6.0.0`) locally on every `git commit` and blocks the commit before any secret ever enters Git history.
+
+**How to set it up in any repository:**
+```bash
+# 1. Install pre-commit (once on your machine)
+brew install pre-commit   # or: pipx install pre-commit
+
+# 2. Copy .pre-commit-config.yaml from this repo (or install via agent-secret-guard)
+#    and activate the git hook in your repo:
+pre-commit install
+
+# 3. Scan existing tracked files right away:
+pre-commit run --all-files
+```
+Commit `.pre-commit-config.yaml` so every collaborator (and AI agent) gets the exact same protection.
 
 ---
 

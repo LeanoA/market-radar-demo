@@ -30,15 +30,15 @@ This repository was engineered from the terminal using **Google Antigravity CLI 
 | **Orchestration Mode** | **Plan / Execute** (`Gemini 4 Pro (Medium)` + `Gemini 4 Flash (High)`) | **Planner** inspects the codebase read-only and defines the plan; **Executor** applies edits, runs `pytest` / visual checks, and hands back on blockers. |
 | **Subagent Delegation** | **Bounded Subagents** | Keeps the main thread focused by delegating heavy exploration or independent checks when needed. |
 | **Domain & UI Skills** | `yahoo-finance`, `modern-web-guidance`, `impeccable`, `web-design-guidelines`, `cognitive-doc-design` | Supplies `yfinance` pipeline patterns, Baseline web APIs (`light-dark()`, `in oklab`, `<dialog closedby>`), botanical sage UI polish, and accessible docs. |
-| **Security Guardrails** | `install-guardrails` (`pre-commit` + `gitleaks`) | Blocks hardcoded secrets and private keys on every commit before code reaches GitHub. |
+| **Security Guardrails** | [`agent-secret-guard`](https://github.com/LeanoA/agent-secret-guard) (`.pre-commit-config.yaml` + `gitleaks` + `detect-private-key`) | Blocks hardcoded secrets and private keys on every `git commit` before code reaches GitHub. |
 
 **Core Concepts for Learners:**
 - **What is Orchestration Mode?** Instead of one monolithic chat trying to hold every file, decision, and edit at once, the agent acts as a *thin coordinator*: **Vertical Orchestration** splits read-only planning (`Gemini 4 Pro (Medium)`) from fast execution (`Gemini 4 Flash (High)`), while **Horizontal Orchestration** spawns isolated subagents for heavy exploration or independent verification.
 - **What is `AGENTS.md`?** A standard Markdown file in the project root written *for AI agents* (like a `README.md` for your coding assistant). It documents build/test commands, coding conventions, and project rules so you don't have to repeat context in every prompt.
-- **What are Skills?** On-demand, modular playbooks (`SKILL.md` + helper scripts) loaded *only* when a task matches their domain (e.g., `modern-web-guidance` for CSS `light-dark()` / `in oklab` or `impeccable` for visual contrast). They teach the model *how to build well* without bloating the base prompt.
-- **What are Guardrails?** Deterministic, non-negotiable enforcement boundaries (terminal sandboxing, read-only Plan Mode locks, `pytest` integrity gates, and `pre-commit` + `gitleaks` secret/private-key scanners) that guarantee *what must never break or leak*, regardless of what the LLM generates.
+- **What are Skills?** On-demand, modular playbooks (`SKILL.md` + helper scripts) loaded *only* when a task matches their domain (e.g., `modern-web-guidance` for CSS `light-dark()` / `in oklab` or `impeccable` for visual contrast). They can be installed via `npx skills add` (`skills.sh`) or copied directly into `.agents/skills/`.
+- **What are Guardrails?** Deterministic, non-negotiable enforcement boundaries (terminal sandboxing, read-only Plan Mode locks, `pytest` integrity gates, and `.pre-commit-config.yaml` with `gitleaks` + `detect-private-key`) that guarantee *what must never break or leak*, regardless of what the LLM generates.
 
-For a step-by-step explanation designed for developers learning AI-assisted engineering, see [`docs/ai-engineering-workflow.md`](docs/ai-engineering-workflow.md).
+For a step-by-step guide—including how to install each skill (`skills.sh` or copy-paste) and set up the pre-commit secret guardrails—see [`docs/ai-engineering-workflow.md`](docs/ai-engineering-workflow.md).
 
 ## Update Schedule
 
