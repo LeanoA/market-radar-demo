@@ -19,6 +19,22 @@
 4. **Medium-Term Fundamentals (20% weight)**:
    - **Forward P/E**, **PEG Ratio**, **EV/EBITDA**, **Revenue Growth YoY**, **Earnings Growth YoY**, **ROE**, and **FCF Margin**.
 
+## AI-Assisted Engineering Stack (Executive Summary)
+
+This repository was engineered from the terminal using a structured, specification-first AI workflow rather than ad-hoc prompting. A dual-model **Orchestrator** separates architectural planning from implementation, backed by persistent cross-session memory, specialized domain skills, and automated secret-scanning guardrails.
+
+| Layer | Component | Role in This Project |
+|---|---|---|
+| **Runtime Platform** | **Google Antigravity CLI (`agy`)** | Terminal agent runtime providing sandboxed shell execution, file tooling, MCP integration, and native subagent orchestration. |
+| **Harness & Methodology** | **Gentle AI — ODD (Organic Driven Development)** | Enforces `Authorize → Explore → Classify → Track → Implement → Verify`, bounded context budgets, and Risk-line verification gates. |
+| **Plan / Execute Pairing** | **Orchestrator** (`Gemini 4 Pro (Medium)` + `Gemini 4 Flash (High)`) | **Planner** inspects the codebase read-only and defines the contract; **Executor** applies edits, runs `pytest` / visual checks, and hands back on blockers. |
+| **Subagent Delegation** | **Dynamic Bounded Workers** | Keeps the main thread thin by delegating broad codebase mapping, parallel independent units, or high-risk verification only when triggers fire. |
+| **Persistent Memory** | **Engram (MCP)** | Preserves architectural decisions, bugfix root causes, and session summaries across sessions and context compactions. |
+| **Domain & UI Skills** | `yahoo-finance`, `modern-web-guidance`, `impeccable`, `web-design-guidelines`, `cognitive-doc-design` | Supplies `yfinance` pipeline patterns, Baseline web APIs (`light-dark()`, `in oklab`, `<dialog closedby>`), botanical sage UI polish, and accessible docs. |
+| **Security Guardrails** | `install-guardrails` (`pre-commit` + `gitleaks`) | Blocks hardcoded secrets and private keys on every commit before code reaches GitHub. |
+
+For a step-by-step explanation designed for developers learning AI-assisted engineering, see [`docs/ai-engineering-workflow.md`](docs/ai-engineering-workflow.md).
+
 ## Update Schedule
 
 - **Automated GitHub Actions Schedule**: Runs Monday–Friday at **21:30 UTC** (`16:30 ET` / `18:30 ART`, after US market close) via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml), plus manual `workflow_dispatch`.

@@ -71,3 +71,10 @@ def test_github_pages_workflow_present() -> None:
     wf = (ROOT / ".github" / "workflows" / "deploy-pages.yml").read_text(encoding="utf-8")
     assert "uv run scripts/build_radar.py" in wf
     assert re.search(r"path:\s*\./site", wf)
+
+
+def test_ai_engineering_docs_linked() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    workflow_doc = ROOT / "docs" / "ai-engineering-workflow.md"
+    assert workflow_doc.exists()
+    assert "docs/ai-engineering-workflow.md" in readme
