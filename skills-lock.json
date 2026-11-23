@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "skills": {
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "commit": "5a37a6329fbad3666c3207392a6a7c0110e92efb",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "5994e4cfd86144903d2ba750f862b9e36af15e3297aac983679e347b99f6cb71"
+    },
+    "yahoo-finance": {
+      "source": "gracefullight/stock-checker",
+      "commit": "fb47f923307cf53df7dfff66753900d55f16be5f",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/yahoo-finance/SKILL.md",
+      "computedHash": "89b7af2d07f5f6062af15553727d8e8b25ed29e68b65830e98d7835aa0b54c2d"
+    }
+  }
+}

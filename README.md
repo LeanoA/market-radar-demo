@@ -77,3 +77,7 @@ uv run --with pytest --with pandas --with numpy pytest -v
 2. **Informational & Educational Use Only — Not Financial Advice**: All indicators, scores, and algorithmic labels (`STRONG BUY`, `ACCUMULATE`, `HOLD / WATCH`, `AVOID`) are computed purely from historical public market data using well-known academic and institutional momentum formulas. Nothing in this repository or live demo constitutes financial, investment, legal, or tax advice, nor a recommendation or solicitation to buy, hold, or sell any security.
 3. **Assumption of Risk**: Equity investing carries substantial risk of capital loss, and past performance or factor scores do not guarantee future results. Each person is solely responsible for their own independent research and assumes full risk for any investment decisions.
 4. **Trademarks & Non-Affiliation**: Yahoo!, Yahoo Finance, and related marks are registered trademarks of Yahoo Inc. S&P 500® is a registered trademark of S&P Dow Jones Indices LLC. This independent open-source project uses the third-party `yfinance` library and is not affiliated with, endorsed by, sponsored by, or officially connected with Yahoo Inc., S&P Global, or any of their affiliates.
+
+## License
+
+Released under the [MIT License](LICENSE).

@@ -78,3 +78,7 @@ def test_ai_engineering_docs_linked() -> None:
     workflow_doc = ROOT / "docs" / "ai-engineering-workflow.md"
     assert workflow_doc.exists()
     assert "docs/ai-engineering-workflow.md" in readme
+    assert (ROOT / "AGENTS.md").exists()
+    assert (ROOT / "LICENSE").exists()
+    assert (ROOT / ".pre-commit-config.yaml").exists()
+    assert (ROOT / "skills-lock.json").exists()
