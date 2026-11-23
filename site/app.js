@@ -10,11 +10,11 @@ const dateFmt = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
   timeStyle: 'short',
 });
+const relTimeFmt = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 const state = {
   payload: null,
-  isLocalServer: false,
   rowMap: new Map(),
   stocksByTicker: new Map(),
   sortCol: 'composite_score',
@@ -34,11 +34,11 @@ const els = {
   reorderStatus: document.getElementById('reorder-status'),
   liveFeedback: document.getElementById('live-feedback'),
   emptyState: document.getElementById('empty-state'),
-  refreshBtn: document.getElementById('refresh-btn'),
   exportCsvBtn: document.getElementById('export-csv-btn'),
   themeToggleBtn: document.getElementById('theme-toggle-btn'),
   dataSourceBadge: document.getElementById('data-source-badge'),
   lastUpdated: document.getElementById('last-updated'),
+  updateSchedule: document.getElementById('update-schedule'),
   kpiSpyPrice: document.getElementById('kpi-spy-price'),
   kpiSpyRegime: document.getElementById('kpi-spy-regime'),
   kpiStage2Pct: document.getElementById('kpi-stage2-pct'),
@@ -383,15 +383,35 @@ function applyFilters() {
   syncUrlFromFilters();
 }
 
+function formatRelativeElapsed(isoTimestamp) {
+  const diffSec = Math.round((new Date(isoTimestamp).getTime() - Date.now()) / 1000);
+  const absSec = Math.abs(diffSec);
+  if (absSec < 60) return relTimeFmt.format(diffSec, 'second');
+  const diffMin = Math.round(diffSec / 60);
+  if (Math.abs(diffMin) < 60) return relTimeFmt.format(diffMin, 'minute');
+  const diffHr = Math.round(diffSec / 3600);
+  if (Math.abs(diffHr) < 24) return relTimeFmt.format(diffHr, 'hour');
+  const diffDay = Math.round(diffSec / 86400);
+  return relTimeFmt.format(diffDay, 'day');
+}
+
+function updateTimestampDisplay() {
+  if (!state.payload?.generated_at) return;
+  const generatedDate = new Date(state.payload.generated_at);
+  const exact = dateFmt.format(generatedDate);
+  const elapsed = formatRelativeElapsed(state.payload.generated_at);
+  els.lastUpdated.textContent = `Last updated: ${exact} (${elapsed})`;
+}
+
 function renderSummary(payload) {
-  const { benchmark, summary, generated_at: generatedAt, data_source: source, stocks } = payload;
+  const { benchmark, summary, data_source: source, stocks } = payload;
   const sourceLabels = {
-    yahoo_finance_live: 'Yahoo Finance Live',
+    yahoo_finance_live: 'Yahoo Finance Snapshot',
     offline_snapshot: 'Offline Snapshot',
     offline_fallback: 'Offline Fallback',
   };
   els.dataSourceBadge.textContent = sourceLabels[source] || source;
-  els.lastUpdated.textContent = `Updated ${dateFmt.format(new Date(generatedAt))}`;
+  updateTimestampDisplay();
 
   els.kpiSpyPrice.textContent = currencyFmt.format(benchmark.price);
   els.kpiSpyRegime.textContent = `${benchmark.ma_regime} · 6M ${fmtSignedPct(benchmark.ret_6m)} · RSI ${benchmark.rsi_14}`;
@@ -528,18 +548,6 @@ function exportVisibleCsv() {
   URL.revokeObjectURL(url);
 }
 
-async function detectLocalServer() {
-  try {
-    const res = await fetch('./api/health', { cache: 'no-store' });
-    if (res.ok) {
-      state.isLocalServer = true;
-      els.refreshBtn.hidden = false;
-    }
-  } catch {
-    state.isLocalServer = false;
-  }
-}
-
 async function loadDataset() {
   try {
     const res = await fetch(DATA_URL, { cache: 'no-store' });
@@ -647,25 +655,6 @@ function wireControls() {
   });
 
   els.exportCsvBtn.addEventListener('click', exportVisibleCsv);
-
-  els.refreshBtn.addEventListener('click', async () => {
-    if (!state.isLocalServer) return;
-    els.refreshBtn.disabled = true;
-    els.refreshBtn.textContent = 'Refreshing…';
-    hideFeedback();
-    try {
-      const res = await fetch('./api/refresh', { method: 'POST' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-      await loadDataset();
-      showFeedback(`Dataset refreshed (${data.universe_size} stocks, source: ${data.data_source}).`);
-    } catch (err) {
-      showFeedback(`Refresh failed: ${err.message}`);
-    } finally {
-      els.refreshBtn.disabled = false;
-      els.refreshBtn.textContent = 'Refresh Yahoo Data';
-    }
-  });
 }
 
 async function init() {
@@ -674,7 +663,8 @@ async function init() {
   wireTableSorting();
   wireDialogFallback();
   wireControls();
-  await Promise.all([detectLocalServer(), loadDataset()]);
+  await loadDataset();
+  window.setInterval(updateTimestampDisplay, 60_000);
 }
 
 init();

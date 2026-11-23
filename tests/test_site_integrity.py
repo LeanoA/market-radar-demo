@@ -23,6 +23,10 @@ def test_site_files_and_accessibility_contracts() -> None:
     assert 'commandfor="radar-table" command="--sort"' in html
     assert 'closedby="any"' in html
     assert 'id="reorder-status" role="status"' in html
+    assert 'id="refresh-btn"' not in html
+    assert "TECHNICAL DEMO" in html
+    assert "Auto-updates Mon–Fri at 21:30 UTC" in html
+    assert "not constitute investment, financial, legal, or tax advice" in html
 
     assert "color-scheme: light dark;" in css
     assert "light-dark(" in css
@@ -34,6 +38,8 @@ def test_site_files_and_accessibility_contracts() -> None:
     assert "closedBy" in js
     assert "moveBefore" in js
     assert "Intl.Collator" in js
+    assert "Intl.RelativeTimeFormat" in js
+    assert "/api/refresh" not in js
     assert "showModal()" in js
 
 

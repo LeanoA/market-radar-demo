@@ -195,8 +195,28 @@ h1 {
   text-wrap: balance;
 }
 
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.demo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.48rem;
+  border-radius: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  background: color-mix(in srgb, var(--warn) 16%, transparent);
+  color: var(--warn);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
 .subtitle {
-  margin: 0.1rem 0 0;
+  margin: 0.15rem 0 0;
   font-size: 0.82rem;
   color: var(--muted);
 }
@@ -205,13 +225,45 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.6rem;
+}
+
+.schedule-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  padding-right: 0.25rem;
+}
+
+.schedule-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .meta-timestamp {
   font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule-meta {
+  font-size: 0.72rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+
+.disclaimer-banner {
+  background: color-mix(in srgb, var(--warn) 9%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--border));
+  border-left: 3px solid var(--warn);
+  border-radius: 0.65rem;
+  padding: 0.7rem 0.95rem;
+  font-size: 0.82rem;
+  color: var(--text);
 }
 
 .btn {
@@ -896,8 +948,45 @@ dialog::backdrop {
 
 .dialog-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
   border-top: 1px solid var(--border);
   padding-top: 0.8rem;
+}
+
+.dialog-disclaimer {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  flex: 1 1 240px;
+}
+
+.dialog-footer-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.disclaimer-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.15rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.disclaimer-section h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.disclaimer-section p {
+  margin: 0.4rem 0 0;
+}
+
+.disclaimer-section code {
+  font-size: 0.78rem;
 }

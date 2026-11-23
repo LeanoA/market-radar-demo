@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#0b0f17">
-  <title>Market Radar — SOTA Momentum &amp; Medium-Term Screener</title>
+  <title>Market Radar Demo — SOTA Momentum &amp; Medium-Term Screener</title>
   <link rel="stylesheet" href="./styles.css">
   <script type="module" src="./app.js"></script>
 </head>
@@ -17,17 +17,24 @@
       <div class="brand-group">
         <div class="brand-mark" aria-hidden="true">MR</div>
         <div class="min-w-0">
-          <h1>Market Radar</h1>
-          <p class="subtitle">Top 50 S&amp;P 500 &middot; SOTA Momentum &amp; Medium-Term Screener</p>
+          <div class="title-row">
+            <h1>Market Radar Demo</h1>
+            <span class="demo-badge" translate="no">TECHNICAL DEMO</span>
+          </div>
+          <p class="subtitle">Top 50 S&amp;P 500 &middot; SOTA Momentum &amp; Medium-Term Quantitative Screener</p>
         </div>
       </div>
 
       <div class="topbar-actions">
-        <span id="data-source-badge" class="pill pill-neutral" title="Active dataset source">Loading…</span>
-        <span id="last-updated" class="meta-timestamp">Updated —</span>
-        <button type="button" id="refresh-btn" class="btn btn-primary" hidden>
-          Refresh Yahoo Data
-        </button>
+        <div class="schedule-box" aria-label="Dataset update status and schedule">
+          <div class="schedule-line">
+            <span id="data-source-badge" class="pill pill-neutral" title="Active dataset source">Loading…</span>
+            <span id="last-updated" class="meta-timestamp">Last updated: —</span>
+          </div>
+          <span id="update-schedule" class="schedule-meta">
+            Auto-updates Mon–Fri at 21:30 UTC (16:30 ET / 18:30 ART, post-US market close)
+          </span>
+        </div>
         <button type="button" id="export-csv-btn" class="btn btn-secondary">
           Export CSV
         </button>
@@ -45,6 +52,10 @@
   </header>
 
   <main id="main-content" class="container">
+    <aside class="disclaimer-banner" aria-label="Technical demo notice">
+      <strong>AI Engineering Technical Demo &amp; Informational Notice:</strong>
+      Built as a technical demonstration of AI-assisted software development using public Yahoo Finance data and established academic momentum indicators. This tool is for educational and informational purposes only—<strong>not financial advice</strong>. You assume full responsibility and risk for any investment decisions.
+    </aside>
     <section class="pulse-grid" aria-label="Market pulse summary">
       <article class="kpi-card">
         <span class="kpi-label">Benchmark (<span translate="no">SPY</span>)</span>
@@ -234,6 +245,19 @@
         </div>
       </details>
     </section>
+
+    <footer class="disclaimer-section" aria-label="Technical demo and financial risk disclaimer">
+      <h2>Technical Demo &amp; Financial Risk Disclaimer</h2>
+      <p>
+        <strong>1. Technical Demonstration:</strong> Market Radar Demo was built as a technical demonstration of AI-assisted software engineering and automated quantitative data pipelines. Market data is sourced from public Yahoo Finance endpoints via <code>yfinance</code> and refreshed on a scheduled basis (Monday–Friday at 21:30 UTC / 16:30 ET / 18:30 ART, after US market close). Data accuracy, completeness, or real-time timeliness is not guaranteed.
+      </p>
+      <p>
+        <strong>2. Standard Indicators, Not Investment Advice:</strong> All metrics displayed—including 12-1M and 6-1M Momentum (Jegadeesh &amp; Titman), Frog-in-the-Pan (Da, Gurun &amp; Warachka), 52-Week High Proximity (George &amp; Hwang), Sharpe/Sortino ratios, Relative Strength vs. SPY, Moving Average Stage Regimes, and composite scores/labels such as &ldquo;STRONG BUY&rdquo; or &ldquo;ACCUMULATE&rdquo;—are standard, publicly documented quantitative indicators computed algorithmically. They are provided strictly for educational, research, and technical evaluation purposes and do not constitute investment, financial, legal, or tax advice, nor a solicitation or recommendation to buy, hold, or sell any security.
+      </p>
+      <p>
+        <strong>3. Assumption of Risk:</strong> Investing in equities involves substantial risk, including the possible loss of principal. Past performance and quantitative factor scores do not guarantee future returns. Every user is solely responsible for conducting their own independent due diligence and assumes all risk and liability for any trading or investment decision made using or referencing this demo.
+      </p>
+    </footer>
   </main>
 
   <dialog id="stock-detail-dialog" closedby="any" aria-labelledby="dialog-stock-title">
@@ -265,10 +289,15 @@
       </div>
 
       <footer class="dialog-footer">
-        <a id="dialog-yahoo-link" href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-          Open on Yahoo Finance
-        </a>
-        <button type="submit" class="btn btn-secondary">Done</button>
+        <p class="dialog-disclaimer">
+          Algorithmic demo output from public historical data—not investment advice. You assume all market risk.
+        </p>
+        <div class="dialog-footer-actions">
+          <a id="dialog-yahoo-link" href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            Open on Yahoo Finance
+          </a>
+          <button type="submit" class="btn btn-secondary">Done</button>
+        </div>
       </footer>
     </form>
   </dialog>

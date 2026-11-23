@@ -1,6 +1,8 @@
-# Market Radar — Top 50 S&P 500 SOTA Momentum & Medium-Term Screener
+# Market Radar Demo — Top 50 S&P 500 SOTA Momentum & Medium-Term Screener
 
-A quantitative equity screener powered by public Yahoo Finance data (`yfinance`), designed to run **locally with on-demand refresh** and deploy automatically as a static web app on **GitHub Pages**.
+> **Technical Demo Notice:** This repository (`LeanoA/market-radar-demo`) is a technical demonstration of AI-assisted software engineering and automated quantitative data pipelines built on public Yahoo Finance data (`yfinance`).
+>
+> **Live Demo:** https://leanoa.github.io/market-radar-demo/
 
 ## SOTA Indicators Included
 
@@ -17,6 +19,11 @@ A quantitative equity screener powered by public Yahoo Finance data (`yfinance`)
 4. **Medium-Term Fundamentals (20% weight)**:
    - **Forward P/E**, **PEG Ratio**, **EV/EBITDA**, **Revenue Growth YoY**, **Earnings Growth YoY**, **ROE**, and **FCF Margin**.
 
+## Update Schedule
+
+- **Automated GitHub Actions Schedule**: Runs Monday–Friday at **21:30 UTC** (`16:30 ET` / `18:30 ART`, after US market close) via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml), plus manual `workflow_dispatch`.
+- The UI header displays both the **exact timestamp and relative elapsed time** (`Last updated`) and the recurring update schedule.
+
 ## Run Locally
 
 Requirements: Python 3.11+ and [`uv`](https://docs.astral.sh/uv/).
@@ -25,7 +32,7 @@ Requirements: Python 3.11+ and [`uv`](https://docs.astral.sh/uv/).
 # 1. Build fresh data from Yahoo Finance
 uv run scripts/build_radar.py
 
-# 2. Start the local server (includes live "Refresh Yahoo Data" button)
+# 2. Serve the static site locally
 python3 scripts/serve_local.py
 ```
 
@@ -43,8 +50,8 @@ uv run scripts/build_radar.py --offline
 uv run --with pytest --with pandas --with numpy pytest -v
 ```
 
-## Deploy to GitHub Pages
+## Technical Demo & Financial Risk Disclaimer
 
-1. Push this repository to GitHub on the `main` branch.
-2. Go to **Settings -> Pages -> Build and deployment** and select **Source: GitHub Actions**.
-3. The workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) refreshes `site/data/market-radar.json` every weekday after US market close (21:30 UTC) and on manual dispatch, then deploys `./site` to GitHub Pages.
+1. **AI-Assisted Software Engineering Demonstration**: This application was created as a technical showcase of AI-assisted software development, quantitative metric pipelines, and modern static web architecture.
+2. **Informational & Educational Use Only — Not Financial Advice**: All indicators, scores, and algorithmic labels (`STRONG BUY`, `ACCUMULATE`, `HOLD / WATCH`, `AVOID`) are computed purely from historical public market data using well-known academic and institutional momentum formulas. Nothing in this repository or live demo constitutes financial, investment, legal, or tax advice, nor a recommendation or solicitation to buy, hold, or sell any security.
+3. **Assumption of Risk**: Equity investing carries substantial risk of capital loss, and past performance or factor scores do not guarantee future results. Each person is solely responsible for their own independent research and assumes full risk for any investment decisions.
