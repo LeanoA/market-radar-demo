@@ -27,9 +27,15 @@ def test_site_files_and_accessibility_contracts() -> None:
     assert "TECHNICAL DEMO" in html
     assert "Auto-updates Mon–Fri at 21:30 UTC" in html
     assert "not constitute investment, financial, legal, or tax advice" in html
+    assert 'data-pillar="momentum"' in html
+    assert 'id="dialog-prev-btn"' in html
+    assert 'id="dialog-next-btn"' in html
+    assert 'id="empty-reset-btn"' in html
 
     assert "color-scheme: light dark;" in css
     assert "light-dark(" in css
+    assert "--accent-contrast:" in css
+    assert "--font-mono:" in css
     assert "@container (width < 640px)" in css
     assert "prefers-reduced-motion: reduce" in css
     assert "font-variant-numeric: tabular-nums;" in css
@@ -40,6 +46,7 @@ def test_site_files_and_accessibility_contracts() -> None:
     assert "Intl.Collator" in js
     assert "Intl.RelativeTimeFormat" in js
     assert "/api/refresh" not in js
+    assert "uv run scripts/build_radar.py" not in js
     assert "showModal()" in js
 
 
