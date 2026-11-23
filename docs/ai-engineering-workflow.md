@@ -99,7 +99,7 @@ You can add any of these skills to your own repository in two ways:
    # Accessibility & web UI guidelines
    npx skills add vercel-labs/agent-skills --skill web-design-guidelines
    ```
-2. **Via manual copy-paste:** Copy any skill folder (containing `SKILL.md` plus optional `scripts/` or `references/`) directly into your project's `.agents/skills/<skill-name>/` directory (or your global Antigravity skills directory). In this repository, `.agents/skills/impeccable`, `.agents/skills/yahoo-finance`, and `.agents/skills/web-design-guidelines` are checked in locally, while `modern-web-guidance` runs via `npx -y modern-web-guidance@latest`.
+2. **Via manual copy-paste:** Copy any skill folder (containing `SKILL.md` plus optional `scripts/` or `references/`) directly into your project's `.agents/skills/<skill-name>/` directory (or your global Antigravity skills directory). In this setup, `.agents/skills/impeccable`, `.agents/skills/yahoo-finance`, and `.agents/skills/web-design-guidelines` live locally in `.agents/skills/` (with `skills-lock.json` committed to the repo), while `modern-web-guidance` runs via `npx -y modern-web-guidance@latest`.
 
 ### Deterministic Guardrails Enforced in This Project
 
