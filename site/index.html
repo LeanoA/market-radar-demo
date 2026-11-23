@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0b0f17">
+  <title>Market Radar — SOTA Momentum &amp; Medium-Term Screener</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to screener table</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group">
+        <div class="brand-mark" aria-hidden="true">MR</div>
+        <div class="min-w-0">
+          <h1>Market Radar</h1>
+          <p class="subtitle">Top 50 S&amp;P 500 &middot; SOTA Momentum &amp; Medium-Term Screener</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <span id="data-source-badge" class="pill pill-neutral" title="Active dataset source">Loading…</span>
+        <span id="last-updated" class="meta-timestamp">Updated —</span>
+        <button type="button" id="refresh-btn" class="btn btn-primary" hidden>
+          Refresh Yahoo Data
+        </button>
+        <button type="button" id="export-csv-btn" class="btn btn-secondary">
+          Export CSV
+        </button>
+        <button
+          type="button"
+          id="theme-toggle-btn"
+          class="btn btn-secondary"
+          aria-pressed="true"
+          aria-label="Toggle color theme"
+        >
+          Light Mode
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="container">
+    <section class="pulse-grid" aria-label="Market pulse summary">
+      <article class="kpi-card">
+        <span class="kpi-label">Benchmark (<span translate="no">SPY</span>)</span>
+        <strong id="kpi-spy-price" class="kpi-value">—</strong>
+        <span id="kpi-spy-regime" class="kpi-sub">Loading…</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Stage 2 Uptrend Breadth</span>
+        <strong id="kpi-stage2-pct" class="kpi-value">—</strong>
+        <span id="kpi-stage2-count" class="kpi-sub">— of 50 constituents</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Strong Buy / Accumulate</span>
+        <strong id="kpi-signals-count" class="kpi-value">—</strong>
+        <span id="kpi-avg-mom" class="kpi-sub">Avg 12-1M Mom: —</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Leading Sector</span>
+        <strong id="kpi-top-sector" class="kpi-value kpi-value-text">—</strong>
+        <span id="kpi-visible-count" class="kpi-sub">Showing 0 stocks</span>
+      </article>
+    </section>
+
+    <section class="controls-panel" aria-label="Strategy presets and filters">
+      <div class="presets-row" role="group" aria-label="SOTA strategy presets">
+        <button type="button" class="preset-chip" data-preset="all" aria-pressed="true">All Top 50</button>
+        <button type="button" class="preset-chip" data-preset="leaders" aria-pressed="false">SOTA Leaders (&ge; 75 &amp; Stage 2)</button>
+        <button type="button" class="preset-chip" data-preset="smooth" aria-pressed="false">Smooth Accumulators (FIP &amp; Flow)</button>
+        <button type="button" class="preset-chip" data-preset="garp" aria-pressed="false">GARP + Momentum (PEG &lt; 2.0)</button>
+        <button type="button" class="preset-chip" data-preset="pullback" aria-pressed="false">Bullish Pullbacks (RSI 40–58)</button>
+      </div>
+
+      <form class="filters-grid" id="filters-form" autocomplete="off">
+        <div class="field">
+          <label for="filter-search">Search Ticker or Company</label>
+          <input
+            id="filter-search"
+            name="q"
+            type="search"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="e.g. NVDA, Microsoft…"
+          >
+        </div>
+
+        <div class="field">
+          <label for="filter-sector">Sector</label>
+          <select id="filter-sector" name="sector">
+            <option value="all">All Sectors</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="filter-regime">Trend Regime</label>
+          <select id="filter-regime" name="regime">
+            <option value="all">All Regimes</option>
+            <option value="Stage 2 Uptrend">Stage 2 Uptrend</option>
+            <option value="Bullish Pullback">Bullish Pullback</option>
+            <option value="Early Recovery">Early Recovery</option>
+            <option value="Consolidation">Consolidation</option>
+            <option value="Stage 4 Downtrend">Stage 4 Downtrend</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="filter-min-score">Min SOTA Score: <output id="min-score-output" for="filter-min-score">0</output></label>
+          <input
+            id="filter-min-score"
+            name="minScore"
+            type="range"
+            min="0"
+            max="90"
+            step="5"
+            value="0"
+          >
+        </div>
+
+        <div class="field field-action">
+          <button type="button" id="reset-filters-btn" class="btn btn-secondary">Reset Filters</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="table-section" aria-label="Screener results">
+      <p id="reorder-status" role="status" class="visually-hidden"></p>
+      <div id="live-feedback" role="status" aria-live="polite" class="feedback-banner" hidden></div>
+
+      <div tabindex="0" role="region" aria-labelledby="radar-table-caption" class="table-wrapper">
+        <table id="radar-table">
+          <caption id="radar-table-caption" class="visually-hidden">
+            Top 50 S&amp;P 500 SOTA Momentum and Medium-Term Quantitative Screener
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" data-type="text" data-col="ticker">
+                <button type="button" commandfor="radar-table" command="--sort">Stock</button>
+              </th>
+              <th scope="col" data-type="number" data-col="composite_score" aria-sort="descending">
+                <button type="button" commandfor="radar-table" command="--sort">SOTA Score</button>
+              </th>
+              <th scope="col" data-type="text" data-col="signal">
+                <button type="button" commandfor="radar-table" command="--sort">Signal</button>
+              </th>
+              <th scope="col" data-type="number" data-col="price">
+                <button type="button" commandfor="radar-table" command="--sort">Price &amp; 30D</button>
+              </th>
+              <th scope="col" data-type="number" data-col="mom_12_1">
+                <button type="button" commandfor="radar-table" command="--sort" title="Jegadeesh-Titman 12-Month Return excluding last month">Mom 12-1M</button>
+              </th>
+              <th scope="col" data-type="number" data-col="mom_6_1">
+                <button type="button" commandfor="radar-table" command="--sort" title="6-Month Return excluding last month">Mom 6-1M</button>
+              </th>
+              <th scope="col" data-type="number" data-col="ret_3m">
+                <button type="button" commandfor="radar-table" command="--sort">3M Return</button>
+              </th>
+              <th scope="col" data-type="number" data-col="rs_spy_6m">
+                <button type="button" commandfor="radar-table" command="--sort" title="6M Alpha vs SPY and Cross-Sectional RS Rating (1-99)">RS vs SPY</button>
+              </th>
+              <th scope="col" data-type="number" data-col="fip_quality">
+                <button type="button" commandfor="radar-table" command="--sort" title="Frog-in-the-Pan trend smoothness score (0-100)">FIP Quality</button>
+              </th>
+              <th scope="col" data-type="number" data-col="high_52w_prox">
+                <button type="button" commandfor="radar-table" command="--sort" title="Current price as percentage of 52-week high">52W High %</button>
+              </th>
+              <th scope="col" data-type="text" data-col="ma_regime">
+                <button type="button" commandfor="radar-table" command="--sort">Regime</button>
+              </th>
+              <th scope="col" data-type="number" data-col="rsi_14">
+                <button type="button" commandfor="radar-table" command="--sort">RSI 14</button>
+              </th>
+              <th scope="col" data-type="number" data-col="sortino_1y">
+                <button type="button" commandfor="radar-table" command="--sort">Sortino 1Y</button>
+              </th>
+              <th scope="col" data-type="number" data-col="up_down_vol_ratio">
+                <button type="button" commandfor="radar-table" command="--sort" title="60-Day Up-Day Volume / Down-Day Volume">Up/Dn Vol</button>
+              </th>
+              <th scope="col" data-type="number" data-col="forward_pe">
+                <button type="button" commandfor="radar-table" command="--sort">Fwd P/E</button>
+              </th>
+              <th scope="col" data-type="number" data-col="peg_ratio">
+                <button type="button" commandfor="radar-table" command="--sort">PEG</button>
+              </th>
+              <th scope="col" data-type="number" data-col="rev_growth">
+                <button type="button" commandfor="radar-table" command="--sort">Rev YoY</button>
+              </th>
+              <th scope="col" data-type="number" data-col="roe">
+                <button type="button" commandfor="radar-table" command="--sort">ROE</button>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="radar-tbody"></tbody>
+        </table>
+      </div>
+      <p id="empty-state" class="empty-state" hidden>
+        No stocks match the active filters. Try lowering the minimum SOTA Score or resetting filters.
+      </p>
+    </section>
+
+    <section class="methodology-section">
+      <details>
+        <summary>SOTA Indicator Methodology &amp; Scoring Weights</summary>
+        <div class="methodology-grid">
+          <article>
+            <h3>1. Risk-Adjusted Momentum (35%)</h3>
+            <p>
+              Combines <strong>12-1M</strong> and <strong>6-1M Momentum</strong> (Jegadeesh &amp; Titman factor excluding the most recent month to avoid short-term mean reversion) with <strong>1Y Sortino Ratio</strong> to reward upside convexity over downside volatility.
+            </p>
+          </article>
+          <article>
+            <h3>2. Trend Quality &amp; Relative Strength (25%)</h3>
+            <p>
+              Uses <strong>Frog-in-the-Pan (FIP)</strong> smoothness (Da, Gurun &amp; Warachka), <strong>52W High Proximity</strong> (George &amp; Hwang), cross-sectional <strong>RS Rating (1–99)</strong>, and <strong>Stage 2 MA Regime</strong> (<span translate="no">Price &gt; SMA50 &gt; SMA200</span>).
+            </p>
+          </article>
+          <article>
+            <h3>3. Institutional Flow &amp; Alpha (20%)</h3>
+            <p>
+              Tracks <strong>60D Up/Down Volume Ratio</strong> (&gt; 1.15 signals accumulation), <strong>20D/90D Relative Volume</strong>, and <strong>6M Alpha vs <span translate="no">SPY</span></strong>.
+            </p>
+          </article>
+          <article>
+            <h3>4. Medium-Term Fundamentals (20%)</h3>
+            <p>
+              Balances momentum with operating backing: <strong>Revenue Growth YoY</strong>, <strong>Earnings Growth YoY</strong>, <strong>Return on Equity (ROE)</strong>, and <strong>PEG Ratio</strong> discipline.
+            </p>
+          </article>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <dialog id="stock-detail-dialog" closedby="any" aria-labelledby="dialog-stock-title">
+    <form method="dialog" class="dialog-card">
+      <header class="dialog-header">
+        <div>
+          <span id="dialog-sector-badge" class="pill pill-neutral">—</span>
+          <h2 id="dialog-stock-title" translate="no">—</h2>
+          <p id="dialog-stock-subtitle" class="dialog-subtitle">—</p>
+        </div>
+        <button type="submit" class="btn btn-secondary" aria-label="Close stock details">Close</button>
+      </header>
+
+      <div class="dialog-body">
+        <div class="dialog-summary-row">
+          <div class="dialog-score-box">
+            <span class="kpi-label">SOTA Composite</span>
+            <strong id="dialog-composite-score" class="dialog-big-number">—</strong>
+            <span id="dialog-signal-badge" class="signal-badge">—</span>
+          </div>
+          <div class="dialog-chart-box" id="dialog-chart-container"></div>
+        </div>
+
+        <div class="pillars-grid" id="dialog-pillars-grid"></div>
+
+        <div class="dialog-metrics-grid" id="dialog-metrics-grid"></div>
+
+        <div class="dialog-thesis" id="dialog-thesis"></div>
+      </div>
+
+      <footer class="dialog-footer">
+        <a id="dialog-yahoo-link" href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          Open on Yahoo Finance
+        </a>
+        <button type="submit" class="btn btn-secondary">Done</button>
+      </footer>
+    </form>
+  </dialog>
+</body>
+</html>
