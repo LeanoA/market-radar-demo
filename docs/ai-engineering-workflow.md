@@ -51,19 +51,21 @@ flowchart LR
 5. **Track**: Large multi-session features create a specification/task logbook (`odd/tasks/<feature>.md` + Engram mirror); small understood changes stay inline without ceremony.
 6. **Implement & Verify**: Execute step by step, run focused tests and suites, and close every code change with an explicit **Risk line** (`Risk: none` or `Risk: item N`).
 
-### Dual-Model Pairing: Orchestrator (Plan / Execute)
+### What Is "Orchestration Mode"? (And Why Single-Chat Prompting Fails at Scale)
 
-Rather than asking a single model call to think through architecture and grind through repetitive edits at the same time, the **Orchestrator** configuration splits the loop across two specialized models:
+In naive single-chat prompting, one LLM session reads dozens of files, debates architecture, writes code, and reviews its own output inside an ever-growing context window. As context fills up, signal drowns in noise ("context rot"): earlier constraints get forgotten, edits drift, and the model wastes reasoning capacity on mechanical tasks (or rushes architectural decisions).
 
-- **Planner — `Gemini 4 Pro (Medium)`**: Runs in read-only **Plan Mode**. It investigates the codebase, loads relevant skills, makes architectural tradeoffs, and writes a concrete step-by-step plan with explicit verification commands and re-plan triggers.
-- **Executor — `Gemini 4 Flash (High)`**: Receives the approved plan with Plan Mode disabled. It executes edits rapidly, runs `pytest` and visual checks, and hands control back to the Planner if a step fails twice or a hidden assumption breaks.
+**Orchestration Mode** solves this by treating the main session as a **thin coordinator** operating along two axes:
 
-### Subagent Delegation (Why & When)
-
-Keeping the parent thread thin prevents context rot. Under Gentle AI ODD, subagents are **never** spawned just because a task feels big—they fire only for concrete triggers:
-- **Mapping trigger**: Exploration exceeds a single small read batch (~5+ lookups), so a read-only explorer maps the code and returns concise `path:line` evidence.
-- **Writer trigger**: Two or more genuinely independent units with disjoint files can run in parallel, or the parent context approaches its backstop.
-- **Verification trigger**: A change touches a named **high-risk item** (irreversible data migrations, security/auth, breaking public contracts, concurrency, CI/deploy, or untested paths), earning an independent read-only verifier.
+1. **Vertical Orchestration (Plan → Execute Hand-off):**
+   - **Planner (`Gemini 4 Pro (Medium)`)** starts every turn in read-only **Plan Mode**. It cannot edit project files; its only job is to inspect evidence, load relevant skills, resolve tradeoffs, and produce an explicit step-by-step contract with verification commands and `"Re-plan if"` triggers.
+   - **Executor (`Gemini 4 Flash (High)`)** receives the approved contract via `exit_plan_mode` with Plan Mode disabled. It applies the edits quickly, runs `pytest` and visual checks, and **hands back** to the Planner (`enter_plan_mode`) immediately if a verification check fails twice or an assumption breaks—never guessing past the plan.
+2. **Horizontal Orchestration (Parent Thread → Bounded Subagents):**
+   - The parent thread enforces a tight inline evidence budget (~10k tokens / small read batches) so it stays focused on decisions and synthesis.
+   - Under Gentle AI ODD, subagents (`define_subagent` / `invoke_subagent`) are **never** spawned just because a task feels large—they fire only when deterministic triggers hold:
+     - **Mapping trigger**: Understanding requires more than ~5 sequential lookups, so a read-only explorer maps the code and returns concise `path:line` evidence.
+     - **Writer trigger**: Two or more genuinely independent units with disjoint files can run in parallel, or the parent context approaches its backstop.
+     - **Verification trigger**: A change touches a named **high-risk item** (irreversible data migrations, security/auth, breaking public contracts, concurrency, CI/deploy, or untested paths), earning an independent read-only verifier without the writer's context.
 
 ### Persistent Memory: Engram (MCP)
 
@@ -71,18 +73,39 @@ LLMs start every session stateless. **Engram** gives the agent structured, proje
 
 ---
 
-## 2. Specialized Skills & Guardrails Used in This Project
+## 2. What Are Skills vs. Guardrails? (A Learner's Mental Model)
 
-Skills are modular `SKILL.md` instruction packages loaded dynamically when a task matches their domain. Instead of relying on stale training weights, the agent consults authoritative, up-to-date playbooks before editing.
+Newcomers often confuse **skills** and **guardrails** because both shape how an AI agent behaves. In practice, they play opposite, complementary roles:
 
-| Skill / Plugin | Origin / Scope | What It Contributed to Market Radar Demo |
+| Dimension | Skills (Additive Capability) | Guardrails (Preventive Boundaries) |
+|---|---|---|
+| **Core question** | *"How do we build X to a high standard?"* | *"What must never break, leak, or bypass checks?"* |
+| **How they run** | Loaded **on demand** by the agent when a task matches a domain (`SKILL.md` + scripts/CLI). | Enforced **deterministically** by the runtime, sandbox, test runner, or Git hooks—even if the model forgets. |
+| **Failure mode prevented** | Outdated APIs, generic "AI-slop" styling, sloppy docs, or wrong domain formulas. | Leaked API keys/private keys, unauthorized file mutations, broken contracts, or unverified regressions. |
+| **Examples in this repo** | `yahoo-finance`, `modern-web-guidance`, `impeccable`, `web-design-guidelines`, `cognitive-doc-design` | `enableTerminalSandbox`, read-only Plan Mode lock, `pytest` integrity suite, `pre-commit` + `gitleaks` |
+
+### Specialized Skills Used in This Project
+
+Skills are modular `SKILL.md` instruction packages loaded dynamically when a task matches their domain. Instead of relying on stale training weights, the agent consults authoritative, up-to-date playbooks before editing:
+
+| Skill | Origin / Scope | What It Contributed to Market Radar Demo |
 |---|---|---|
 | **`yahoo-finance`** | Project skill (`.agents/skills/yahoo-finance`) | Guided safe `yfinance` data extraction, historical price windows, and fundamental fields in `scripts/build_radar.py`. |
 | **`modern-web-guidance`** | Global plugin (`modern-web-guidance`) | Enforced Baseline modern web APIs with progressive fallbacks: `<dialog closedby="any">`, HTML Invoker Commands (`commandfor`/`command="--sort"`), `Element.prototype.moveBefore()`, `light-dark()`, and `color-mix(in oklab, ...)` to prevent washed-out or hue-shifted tints. |
 | **`impeccable`** | Project skill (`.agents/skills/impeccable`) | Guided visual hierarchy, WCAG AA contrast checks, replacing generic dark-cyan "AI aesthetics" with the **botanical sage & warm paper / deep moss** palette, and running automated headless browser captures (`impeccable shot`) at `1440x900` and `390x844`. |
 | **`web-design-guidelines`** | Project skill (`.agents/skills/web-design-guidelines`) | Supplemented accessibility, semantic landmarks, keyboard navigation (`/` search focus, dialog arrow stepping), and responsive table behavior. |
 | **`cognitive-doc-design`** | Gentle AI global skill | Structured documentation (`README.md` and this guide) around low cognitive load: lead with the answer, progressive disclosure, tables over dense prose, and scannable sections. |
-| **`install-guardrails`** | Project plugin (`.agents/plugins/agent-secret-guard`) | Installed `.pre-commit-config.yaml` with `gitleaks` secret scanning and private-key detection, automatically verified on every `git commit`. |
+
+### Deterministic Guardrails Enforced in This Project
+
+Guardrails do not trust LLM willpower—they are automated gates enforced by the environment and repository tooling:
+
+| Guardrail | Mechanism | What It Protects |
+|---|---|---|
+| **Terminal Sandbox** | Antigravity `enableTerminalSandbox: true` | Isolates shell commands from arbitrary network access and host state unless the user explicitly approves elevation. |
+| **Plan Mode Read-Only Lock** | Orchestrator `enter_plan_mode` / `exit_plan_mode` | Prevents the Planner from mutating files during investigation and forces explicit verification criteria before edits begin. |
+| **Commit Secret & Key Guard** | `install-guardrails` (`.pre-commit-config.yaml` + `gitleaks` + `detect-private-key`) | Scans every staged change before `git commit` completes, blocking hardcoded tokens, credentials, or private keys. |
+| **Automated Integrity & Factor Suite** | `pytest` (`tests/test_build_radar.py`, `tests/test_site_integrity.py`) | Verifies quantitative formulas, offline snapshot schema, accessibility attributes, favicon presence, and documentation links. |
 
 ---
 
