@@ -28,6 +28,9 @@ def test_site_files_and_accessibility_contracts() -> None:
     assert "Auto-updates Mon–Fri at 21:30 UTC" in html
     assert "not constitute investment, financial, legal, or tax advice" in html
     assert 'data-pillar="momentum"' in html
+    assert (SITE / "favicon.svg").exists()
+    assert '<link rel="icon" href="./favicon.svg"' in html
+    assert "Trademarks &amp; Non-Affiliation" in html
     assert 'id="dialog-prev-btn"' in html
     assert 'id="dialog-next-btn"' in html
     assert 'id="empty-reset-btn"' in html
