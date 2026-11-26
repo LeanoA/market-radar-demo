@@ -34,6 +34,8 @@ def test_site_files_and_accessibility_contracts() -> None:
     assert 'id="dialog-prev-btn"' in html
     assert 'id="dialog-next-btn"' in html
     assert 'id="empty-reset-btn"' in html
+    assert 'https://github.com/LeanoA/market-radar-demo' in html
+    assert 'Alexander Nelson Leano' in html
 
     assert "color-scheme: light dark;" in css
     assert "light-dark(" in css

@@ -1291,3 +1291,26 @@ dialog::backdrop {
   font-family: var(--font-mono);
   font-size: 0.78rem;
 }
+
+.footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+}
+
+.footer-repo-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-repo-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
